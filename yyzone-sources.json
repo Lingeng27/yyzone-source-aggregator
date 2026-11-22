@@ -1,6 +1,6 @@
 {
   "name": "YY ZONE 点播源库",
-  "updatedAt": "2026-11-21T22:01:07Z",
+  "updatedAt": "2026-11-22T22:19:12Z",
   "count": 16,
   "unavailable": [],
   "sources": [
@@ -16,8 +16,8 @@
       ],
       "priority": 0,
       "searchable": true,
-      "ms": 539,
-      "total": 164857,
+      "ms": 476,
+      "total": 164984,
       "path": "from"
     },
     {
@@ -31,8 +31,8 @@
       ],
       "priority": 1,
       "searchable": true,
-      "ms": 1566,
-      "total": 75547,
+      "ms": 1405,
+      "total": 75610,
       "path": "from"
     },
     {
@@ -46,8 +46,8 @@
       ],
       "priority": 2,
       "searchable": true,
-      "ms": 296,
-      "total": 117261,
+      "ms": 489,
+      "total": 117327,
       "path": "from"
     },
     {
@@ -61,8 +61,8 @@
       ],
       "priority": 3,
       "searchable": false,
-      "ms": 138,
-      "total": 118914,
+      "ms": 747,
+      "total": 118980,
       "path": "from"
     },
     {
@@ -76,8 +76,8 @@
       ],
       "priority": 4,
       "searchable": false,
-      "ms": 141,
-      "total": 117851,
+      "ms": 116,
+      "total": 117918,
       "path": "from"
     },
     {
@@ -90,8 +90,8 @@
       ],
       "priority": 5,
       "searchable": true,
-      "ms": 268,
-      "total": 118336,
+      "ms": 162,
+      "total": 118402,
       "path": "from"
     },
     {
@@ -104,8 +104,8 @@
       ],
       "priority": 6,
       "searchable": true,
-      "ms": 327,
-      "total": 118020,
+      "ms": 320,
+      "total": 118086,
       "path": "from"
     },
     {
@@ -118,8 +118,8 @@
       ],
       "priority": 7,
       "searchable": true,
-      "ms": 253,
-      "total": 124565,
+      "ms": 182,
+      "total": 124649,
       "path": "from"
     },
     {
@@ -133,8 +133,8 @@
       ],
       "priority": 8,
       "searchable": false,
-      "ms": 158,
-      "total": 118927,
+      "ms": 118,
+      "total": 118993,
       "path": "from"
     },
     {
@@ -147,8 +147,8 @@
       ],
       "priority": 9,
       "searchable": true,
-      "ms": 460,
-      "total": 92159,
+      "ms": 405,
+      "total": 92208,
       "path": "from"
     },
     {
@@ -162,8 +162,8 @@
       ],
       "priority": 10,
       "searchable": true,
-      "ms": 723,
-      "total": 99216,
+      "ms": 822,
+      "total": 99235,
       "path": "from"
     },
     {
@@ -176,8 +176,8 @@
       ],
       "priority": 11,
       "searchable": true,
-      "ms": 520,
-      "total": 92159,
+      "ms": 391,
+      "total": 92208,
       "path": "from"
     },
     {
@@ -190,8 +190,8 @@
       ],
       "priority": 12,
       "searchable": true,
-      "ms": 433,
-      "total": 49792,
+      "ms": 319,
+      "total": 49799,
       "path": "from"
     },
     {
@@ -203,8 +203,8 @@
       ],
       "priority": 60,
       "searchable": true,
-      "ms": 170,
-      "total": 99217,
+      "ms": 180,
+      "total": 99236,
       "path": "std"
     },
     {
@@ -216,8 +216,8 @@
       ],
       "priority": 60,
       "searchable": true,
-      "ms": 267,
-      "total": 149534,
+      "ms": 203,
+      "total": 149626,
       "path": "std"
     },
     {
@@ -229,8 +229,8 @@
       ],
       "priority": 60,
       "searchable": true,
-      "ms": 513,
-      "total": 173307,
+      "ms": 454,
+      "total": 173510,
       "path": "std"
     }
   ]
