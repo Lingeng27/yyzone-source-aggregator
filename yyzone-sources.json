@@ -1,6 +1,6 @@
 {
   "name": "YY ZONE 点播源库",
-  "updatedAt": "2026-11-24T03:10:20Z",
+  "updatedAt": "2026-11-25T01:16:00Z",
   "count": 16,
   "unavailable": [],
   "sources": [
@@ -16,8 +16,8 @@
       ],
       "priority": 0,
       "searchable": true,
-      "ms": 579,
-      "total": 165153,
+      "ms": 368,
+      "total": 165361,
       "path": "from"
     },
     {
@@ -31,8 +31,8 @@
       ],
       "priority": 1,
       "searchable": true,
-      "ms": 1759,
-      "total": 75729,
+      "ms": 1440,
+      "total": 75743,
       "path": "from"
     },
     {
@@ -46,8 +46,8 @@
       ],
       "priority": 2,
       "searchable": true,
-      "ms": 333,
-      "total": 117443,
+      "ms": 199,
+      "total": 117538,
       "path": "from"
     },
     {
@@ -61,14 +61,14 @@
       ],
       "priority": 3,
       "searchable": false,
-      "ms": 118,
-      "total": 119093,
+      "ms": 3715,
+      "total": 119191,
       "path": "from"
     },
     {
       "id": "cms_huya",
       "name": "虎牙采集",
-      "api": "https://www.huyaapi.com/api.php/provide/vod/from/hym3u8/",
+      "api": "https://www.huyaapi.com/api.php/provide/vod/",
       "tags": [
         "响应快",
         "剧集",
@@ -76,9 +76,9 @@
       ],
       "priority": 4,
       "searchable": false,
-      "ms": 119,
-      "total": 118034,
-      "path": "from"
+      "ms": 49,
+      "total": 118129,
+      "path": "std"
     },
     {
       "id": "cms_hongniu",
@@ -90,8 +90,8 @@
       ],
       "priority": 5,
       "searchable": true,
-      "ms": 234,
-      "total": 118518,
+      "ms": 127,
+      "total": 118613,
       "path": "from"
     },
     {
@@ -104,8 +104,8 @@
       ],
       "priority": 6,
       "searchable": true,
-      "ms": 327,
-      "total": 118202,
+      "ms": 284,
+      "total": 118297,
       "path": "from"
     },
     {
@@ -118,8 +118,8 @@
       ],
       "priority": 7,
       "searchable": true,
-      "ms": 433,
-      "total": 124717,
+      "ms": 322,
+      "total": 124767,
       "path": "from"
     },
     {
@@ -133,8 +133,8 @@
       ],
       "priority": 8,
       "searchable": false,
-      "ms": 179,
-      "total": 119109,
+      "ms": 682,
+      "total": 119205,
       "path": "from"
     },
     {
@@ -147,8 +147,8 @@
       ],
       "priority": 9,
       "searchable": true,
-      "ms": 438,
-      "total": 92262,
+      "ms": 388,
+      "total": 92308,
       "path": "from"
     },
     {
@@ -162,8 +162,8 @@
       ],
       "priority": 10,
       "searchable": true,
-      "ms": 816,
-      "total": 99262,
+      "ms": 893,
+      "total": 99274,
       "path": "from"
     },
     {
@@ -176,8 +176,8 @@
       ],
       "priority": 11,
       "searchable": true,
-      "ms": 664,
-      "total": 92262,
+      "ms": 591,
+      "total": 92308,
       "path": "from"
     },
     {
@@ -190,8 +190,8 @@
       ],
       "priority": 12,
       "searchable": true,
-      "ms": 403,
-      "total": 49811,
+      "ms": 455,
+      "total": 49818,
       "path": "from"
     },
     {
@@ -203,8 +203,8 @@
       ],
       "priority": 60,
       "searchable": true,
-      "ms": 146,
-      "total": 99263,
+      "ms": 60,
+      "total": 99275,
       "path": "std"
     },
     {
@@ -216,8 +216,8 @@
       ],
       "priority": 60,
       "searchable": true,
-      "ms": 295,
-      "total": 149691,
+      "ms": 205,
+      "total": 149742,
       "path": "std"
     },
     {
@@ -229,8 +229,8 @@
       ],
       "priority": 60,
       "searchable": true,
-      "ms": 577,
-      "total": 173616,
+      "ms": 476,
+      "total": 173700,
       "path": "std"
     }
   ]
