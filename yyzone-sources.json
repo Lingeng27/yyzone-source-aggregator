@@ -1,7 +1,7 @@
 {
   "name": "YY ZONE 点播源库",
-  "updatedAt": "2026-11-25T01:16:00Z",
-  "count": 16,
+  "updatedAt": "2026-11-26T00:50:56Z",
+  "count": 15,
   "unavailable": [],
   "sources": [
     {
@@ -16,8 +16,8 @@
       ],
       "priority": 0,
       "searchable": true,
-      "ms": 368,
-      "total": 165361,
+      "ms": 538,
+      "total": 165455,
       "path": "from"
     },
     {
@@ -31,8 +31,8 @@
       ],
       "priority": 1,
       "searchable": true,
-      "ms": 1440,
-      "total": 75743,
+      "ms": 1797,
+      "total": 75812,
       "path": "from"
     },
     {
@@ -46,8 +46,8 @@
       ],
       "priority": 2,
       "searchable": true,
-      "ms": 199,
-      "total": 117538,
+      "ms": 121,
+      "total": 117640,
       "path": "from"
     },
     {
@@ -61,14 +61,14 @@
       ],
       "priority": 3,
       "searchable": false,
-      "ms": 3715,
-      "total": 119191,
+      "ms": 667,
+      "total": 119293,
       "path": "from"
     },
     {
       "id": "cms_huya",
       "name": "虎牙采集",
-      "api": "https://www.huyaapi.com/api.php/provide/vod/",
+      "api": "https://www.huyaapi.com/api.php/provide/vod/from/hym3u8/",
       "tags": [
         "响应快",
         "剧集",
@@ -76,9 +76,9 @@
       ],
       "priority": 4,
       "searchable": false,
-      "ms": 49,
-      "total": 118129,
-      "path": "std"
+      "ms": 125,
+      "total": 118232,
+      "path": "from"
     },
     {
       "id": "cms_hongniu",
@@ -90,8 +90,8 @@
       ],
       "priority": 5,
       "searchable": true,
-      "ms": 127,
-      "total": 118613,
+      "ms": 220,
+      "total": 118714,
       "path": "from"
     },
     {
@@ -104,8 +104,8 @@
       ],
       "priority": 6,
       "searchable": true,
-      "ms": 284,
-      "total": 118297,
+      "ms": 308,
+      "total": 118398,
       "path": "from"
     },
     {
@@ -118,8 +118,8 @@
       ],
       "priority": 7,
       "searchable": true,
-      "ms": 322,
-      "total": 124767,
+      "ms": 230,
+      "total": 124801,
       "path": "from"
     },
     {
@@ -133,8 +133,8 @@
       ],
       "priority": 8,
       "searchable": false,
-      "ms": 682,
-      "total": 119205,
+      "ms": 108,
+      "total": 119307,
       "path": "from"
     },
     {
@@ -147,8 +147,8 @@
       ],
       "priority": 9,
       "searchable": true,
-      "ms": 388,
-      "total": 92308,
+      "ms": 438,
+      "total": 92363,
       "path": "from"
     },
     {
@@ -162,8 +162,8 @@
       ],
       "priority": 10,
       "searchable": true,
-      "ms": 893,
-      "total": 99274,
+      "ms": 764,
+      "total": 99284,
       "path": "from"
     },
     {
@@ -176,8 +176,8 @@
       ],
       "priority": 11,
       "searchable": true,
-      "ms": 591,
-      "total": 92308,
+      "ms": 575,
+      "total": 92363,
       "path": "from"
     },
     {
@@ -190,22 +190,9 @@
       ],
       "priority": 12,
       "searchable": true,
-      "ms": 455,
-      "total": 49818,
+      "ms": 429,
+      "total": 49827,
       "path": "from"
-    },
-    {
-      "id": "hub_ffzy1_tv",
-      "name": "🥗┃非凡┃资源",
-      "api": "http://ffzy1.tv/api.php/provide/vod/",
-      "tags": [
-        "自动发现"
-      ],
-      "priority": 60,
-      "searchable": true,
-      "ms": 60,
-      "total": 99275,
-      "path": "std"
     },
     {
       "id": "hub_suoniapi_com",
@@ -216,8 +203,8 @@
       ],
       "priority": 60,
       "searchable": true,
-      "ms": 205,
-      "total": 149742,
+      "ms": 252,
+      "total": 149775,
       "path": "std"
     },
     {
@@ -229,8 +216,8 @@
       ],
       "priority": 60,
       "searchable": true,
-      "ms": 476,
-      "total": 173700,
+      "ms": 526,
+      "total": 173836,
       "path": "std"
     }
   ]
