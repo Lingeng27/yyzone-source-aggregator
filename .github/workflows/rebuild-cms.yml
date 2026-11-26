@@ -1,0 +1,39 @@
+name: rebuild-cms
+# 一次性：重跑一次源库探测（跑完自删）
+on:
+  push:
+    paths:
+      - '.github/workflows/rebuild-cms.yml'
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: 重算源库
+        run: python build_cms.py
+      - name: 提交源库
+        run: |
+          set -e
+          git config user.name 'yyzone-bot'
+          git config user.email 'bot@yyzone.local'
+          git add yyzone-sources.json
+          if git diff --cached --quiet; then
+            echo '源库无变化'
+          else
+            git commit -m "chore: 自动更新播放源 $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git pull --rebase --autostash -q origin main || true
+            git push
+          fi
+      - name: 清理一次性 workflow
+        run: |
+          set -e
+          git rm --quiet .github/workflows/rebuild-cms.yml
+          git commit -m 'chore: 移除一次性重算 workflow [skip ci]'
+          git pull --rebase --autostash -q origin main || true
+          git push
