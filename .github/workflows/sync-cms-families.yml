@@ -1,0 +1,64 @@
+name: sync-cms-families
+# 一次性：把���回牛牛 / 淘片」的族表与构建脚本写进仓库，并立即重算源库（跑完自删）
+on:
+  push:
+    paths:
+      - '.github/workflows/sync-cms-families.yml'
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      F1: "https://aka.doubaocdn.com/s/RpeBhuWrqC"
+      F1_SHA: "13bc2ee56c44de5c3d40fd1dd483ff118f2372098bcdbf067b5ac78a3130af64"
+      F2: "https://aka.doubaocdn.com/s/QwU6Woa9q9"
+      F2_SHA: "32352199f80e9fe073702f971c19b7ad4b52a28451c3d4019a9d45b6dc034781"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: 拉取并校验
+        run: |
+          set -e
+          curl -fsSL --retry 3 -A "YYZONE/1.0" "$F1" -o cms_families.json
+          echo "$F1_SHA  cms_families.json" | sha256sum -c -
+          curl -fsSL --retry 3 -A "YYZONE/1.0" "$F2" -o build_cms.py
+          echo "$F2_SHA  build_cms.py" | sha256sum -c -
+          python -c "import ast,io;ast.parse(io.open('build_cms.py',encoding='utf-8').read())"
+          python -c "import json;d=json.load(open('cms_families.json'));assert len(d)==15,len(d);print('families',len(d));assert d[-1]['id']=='cms_taopian';assert d[-2]['id']=='cms_niuniu'"
+      - name: 提交族表与构建脚本
+        run: |
+          set -e
+          git config user.name 'yyzone-bot'
+          git config user.email 'bot@yyzone.local'
+          git add cms_families.json build_cms.py
+          if git diff --cached --quiet; then
+            echo '无变化'
+          else
+            git commit -m 'feat(cms): 加回牛牛 / 淘片（淘片走自定义 json 接口）'
+            git pull --rebase --autostash -q origin main || true
+            git push
+          fi
+      - name: 重算源库
+        run: python build_cms.py
+      - name: 提交源库
+        run: |
+          set -e
+          git add yyzone-sources.json
+          if git diff --cached --quiet; then
+            echo '源库无变化'
+          else
+            git commit -m "chore: 自动更新播放源 $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git pull --rebase --autostash -q origin main || true
+            git push
+          fi
+      - name: 清理一次性 workflow
+        run: |
+          set -e
+          git rm --quiet .github/workflows/sync-cms-families.yml
+          git commit -m 'chore: 移除一次性同步 workflow [skip ci]'
+          git pull --rebase --autostash -q origin main || true
+          git push
