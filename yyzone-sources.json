@@ -1,8 +1,11 @@
 {
   "name": "YY ZONE 点播源库",
-  "updatedAt": "2026-11-26T00:50:56Z",
-  "count": 15,
-  "unavailable": [],
+  "updatedAt": "2026-11-26T16:14:28Z",
+  "count": 16,
+  "unavailable": [
+    "cms_huya",
+    "cms_guangsu"
+  ],
   "sources": [
     {
       "id": "cms_liangzi",
@@ -16,8 +19,8 @@
       ],
       "priority": 0,
       "searchable": true,
-      "ms": 538,
-      "total": 165455,
+      "ms": 441,
+      "total": 165549,
       "path": "from"
     },
     {
@@ -31,8 +34,8 @@
       ],
       "priority": 1,
       "searchable": true,
-      "ms": 1797,
-      "total": 75812,
+      "ms": 793,
+      "total": 75873,
       "path": "from"
     },
     {
@@ -46,14 +49,14 @@
       ],
       "priority": 2,
       "searchable": true,
-      "ms": 121,
-      "total": 117640,
+      "ms": 372,
+      "total": 117723,
       "path": "from"
     },
     {
       "id": "cms_jinying",
       "name": "金鹰资源",
-      "api": "https://jyzyapi.com/api.php/provide/vod/from/jinyingm3u8/",
+      "api": "https://jyzyapi.com/api.php/provide/vod/",
       "tags": [
         "响应快",
         "综合",
@@ -61,24 +64,9 @@
       ],
       "priority": 3,
       "searchable": false,
-      "ms": 667,
-      "total": 119293,
-      "path": "from"
-    },
-    {
-      "id": "cms_huya",
-      "name": "虎牙采集",
-      "api": "https://www.huyaapi.com/api.php/provide/vod/from/hym3u8/",
-      "tags": [
-        "响应快",
-        "剧集",
-        "仅列表"
-      ],
-      "priority": 4,
-      "searchable": false,
-      "ms": 125,
-      "total": 118232,
-      "path": "from"
+      "ms": 81,
+      "total": 119376,
+      "path": "std"
     },
     {
       "id": "cms_hongniu",
@@ -90,8 +78,8 @@
       ],
       "priority": 5,
       "searchable": true,
-      "ms": 220,
-      "total": 118714,
+      "ms": 227,
+      "total": 118798,
       "path": "from"
     },
     {
@@ -104,8 +92,8 @@
       ],
       "priority": 6,
       "searchable": true,
-      "ms": 308,
-      "total": 118398,
+      "ms": 293,
+      "total": 118482,
       "path": "from"
     },
     {
@@ -118,23 +106,8 @@
       ],
       "priority": 7,
       "searchable": true,
-      "ms": 230,
-      "total": 124801,
-      "path": "from"
-    },
-    {
-      "id": "cms_guangsu",
-      "name": "光速资源",
-      "api": "https://api.guangsuapi.com/api.php/provide/vod/from/gsm3u8/",
-      "tags": [
-        "体育",
-        "综合",
-        "仅列表"
-      ],
-      "priority": 8,
-      "searchable": false,
-      "ms": 108,
-      "total": 119307,
+      "ms": 273,
+      "total": 124894,
       "path": "from"
     },
     {
@@ -147,8 +120,8 @@
       ],
       "priority": 9,
       "searchable": true,
-      "ms": 438,
-      "total": 92363,
+      "ms": 431,
+      "total": 92420,
       "path": "from"
     },
     {
@@ -162,8 +135,8 @@
       ],
       "priority": 10,
       "searchable": true,
-      "ms": 764,
-      "total": 99284,
+      "ms": 738,
+      "total": 99300,
       "path": "from"
     },
     {
@@ -176,8 +149,8 @@
       ],
       "priority": 11,
       "searchable": true,
-      "ms": 575,
-      "total": 92363,
+      "ms": 431,
+      "total": 92420,
       "path": "from"
     },
     {
@@ -190,9 +163,50 @@
       ],
       "priority": 12,
       "searchable": true,
-      "ms": 429,
-      "total": 49827,
+      "ms": 339,
+      "total": 49836,
       "path": "from"
+    },
+    {
+      "id": "cms_niuniu",
+      "name": "牛牛资源(1080P)",
+      "api": "https://api.niuniuzy.me/api.php/provide/vod/",
+      "tags": [
+        "1080P",
+        "综合"
+      ],
+      "priority": 13,
+      "searchable": true,
+      "ms": 199,
+      "total": 126324,
+      "path": "std"
+    },
+    {
+      "id": "cms_taopian",
+      "name": "淘片采集",
+      "api": "https://taopianapi.com/cjapi/mc/vod/json.html",
+      "tags": [
+        "采集",
+        "更新快"
+      ],
+      "priority": 14,
+      "searchable": true,
+      "ms": 477,
+      "total": 0,
+      "path": "custom"
+    },
+    {
+      "id": "hub_ffzy1_tv",
+      "name": "🥗┃非凡┃资源",
+      "api": "http://ffzy1.tv/api.php/provide/vod/",
+      "tags": [
+        "自动发现"
+      ],
+      "priority": 60,
+      "searchable": true,
+      "ms": 110,
+      "total": 99301,
+      "path": "std"
     },
     {
       "id": "hub_suoniapi_com",
@@ -203,8 +217,8 @@
       ],
       "priority": 60,
       "searchable": true,
-      "ms": 252,
-      "total": 149775,
+      "ms": 224,
+      "total": 149853,
       "path": "std"
     },
     {
@@ -216,8 +230,8 @@
       ],
       "priority": 60,
       "searchable": true,
-      "ms": 526,
-      "total": 173836,
+      "ms": 444,
+      "total": 173928,
       "path": "std"
     }
   ]
