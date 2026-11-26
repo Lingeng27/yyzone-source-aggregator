@@ -1,12 +1,15 @@
 /*!
  * @name YY Zone🎵音源
  * @description 五大平台(wy/tx/kw/kg/mg)聚合直链音源｜基于桌面《洛雪音乐-源》旧源包(41 个 js)逐个实测 + GitHub 上游最新版交叉比对后重建｜每条链路经真实取链 + HTTP Range 音频校验｜按音质能力分层 + 优先级并发 + 串行兜底｜链路健康度与实测延迟动态排序｜结果缓存｜音质自动降级｜kg/mg 支持按歌名跨平台兜底
- * @version 1.3.1
+ * @version 1.3.3
  * @author YY Zone
  * @license MIT
- * @update 2026-11-19
+ * @update 2026-11-26
  * @changelog
- *   - 1.3.1 (2026-11-19) 文件名统一为 yyzone-music-source.js（仓库与安装目录都不再带 lx 字样）；取链逻辑零改动，只把「版本号与文件名约定」跟源库对齐，方便客户端版本比对
+ *   - 1.3.3 (2026-11-26) 酷狗链路整修：唯一主链「星海KG」域名 yy.zddyr.top 已整站不解析（ENOENT），实测 0/4 全挂；官方 trackercdn 五种 key 盐值全 Bad key、web getdata err 30020、GD 不支持 kugou、bileizhen kg 401/404、ikun kg 返回同一张图床图片（非音频）均不可用。
+ *     新增「酷狗官方(128k)」：m.kugou.com 手机版 getSongInfo?cmd=playInfo&hash=（不带 cookie 也下发 sharefs.kugou.com 完整曲，Range 206 audio/mpeg；付费曲明确回「需要付费」），免费曲 200ms 命中真酷狗音频；「酷我检索备用」升为第二链并修好解析（旧实现 ARTIST 落在固定窗口外 → 歌手恒为空 → 防串歌形同失效，现按「上一条锚点→本条锚点」取 ARTIST，并拒收歌手为空的条目），星海KG 移到末位压 3s 超时等域名自愈；实测 kg 免费曲 200~300ms 命中完整音频，付费曲由官方接口明确回「需要付费」后交给客户端自动换源（不再像旧版那样 0/4 静默全挂）；咪咕两条测速链加 5s 超时
+ *   - 1.3.2 (2026-11-26) 网易链路体检：下架 4 条死链（Huibq 503 / FFAPI 拒连 / lzmhhh 401 / 官方匿名 0 命中降为末位）；ikun（8/8·115ms）、bileizhen（8/8·1.3s）提到最前；HYW 降为最后兜底并把单链超时压到 4.5s；httpGet 增加硬超时
+ *   - 1.3.1 (2026-11-19) 文件名统一为 yyzone-music-source.js（仓库与安装目录都不再带 lx 字样）；取链逻辑零改动，纯粹把「版本号与文件名约定」跟源库对齐，方便客户端版本比对
  *   - 1.3.0 (2026-11-09) 整合 pdone 仓库 11-08 新发布的 4 个源（xinglan 星澜 v4.0.2 / qingliang 轻量音源 2.1.0 / suyin 溯音 / feichangdao 非常刀 v5）里实测可用的新端点，链路 31 条：
  *     · tx 新增「讯汇QQ」api.xunhuisi.store（实测两首 mid 全出完整曲，返回 .m4a，播放器内核解码 269.8s 正常）、「lzmhhhQQ」music.lzmhhh.com POST 表单
  *     · wy 新增「FFAPI网易」ffapi.cn（standard/exhigh/lossless 三档全通，lossless 是真 flac 27MB，内核解码 238.7s 正常）、「lzmhhh网易」、「bileizhen网易」（302 直跳音频流）
@@ -80,13 +83,21 @@ const Q_ORDER = ['flac24bit', 'flac', '320k', '192k', '128k']
 // ==================== HTTP 层 ====================
 function httpGet(url, opts = {}) {
   return new Promise((resolve, reject) => {
+    const timeout = opts.timeout || CFG.reqTimeout
     const options = {
       method: opts.method || 'GET',
-      timeout: opts.timeout || CFG.reqTimeout,
+      timeout,
       headers: Object.assign({ 'User-Agent': UA }, opts.headers || {}),
     }
     if (opts.body) options.body = opts.body
+    // r74：LX 宿主的 timeout 在个别环境下不生效（HYW 会挂到 12~20s 才回 500），
+    // 这里再加一层硬超时，保证单链路不会拖住整个切歌流程。
+    let settled = false
+    const timer = setTimeout(() => { if (!settled) { settled = true; reject(new Error('请求超时')) } }, timeout)
     request(url, options, (err, res) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timer)
       if (err) return reject(new Error('请求失败:' + (err && err.message ? err.message : err)))
       const status = (res && res.statusCode) || 0
       if (status >= 400) return reject(new Error('HTTP ' + status))
@@ -159,6 +170,15 @@ function getSongId(platform, mi) {
   }
 }
 
+/** 酷狗按音质取 hash：musicInfo._types = { '128k': {hash}, '320k': {hash}, flac: {hash} } */
+function kgHashOf(mi, q) {
+  const t = (mi && (mi._types || null)) || null
+  const g = (k) => (t && t[k] && (t[k].hash || t[k].mhash)) || ''
+  if (q === 'flac24bit' || q === 'flac') return g('flac') || g('320k') || g('128k') || ''
+  if (q === '320k' || q === '192k') return g('320k') || g('128k') || ''
+  return g('128k') || (mi && mi.hash) || ''
+}
+
 function getSongName(mi) { return pickField(mi, ['name', 'songName', 'title']) }
 function getSinger(mi) {
   const s = pickField(mi, ['singer', 'artist', 'author'])
@@ -214,6 +234,8 @@ const KW_BR = { flac24bit: '4000kflac', flac: '2000kflac', '320k': '320kmp3', '1
 const TX_YF = { flac24bit: '母带', flac: 'SQ', '320k': 'HQ', '192k': 'HQ', '128k': '标准' }
 // pdone 11-08 新源带来的端点音质映射
 const FFAPI_Q = { flac24bit: 'lossless', flac: 'lossless', '320k': 'exhigh', '192k': 'exhigh', '128k': 'standard' }
+/* bileizhen 网易音质档映射（r74 实测 lossless/exhigh/standard 三档均出音频流） */
+const BIZ_LEVEL = { flac24bit: 'lossless', flac: 'lossless', '320k': 'exhigh', '192k': 'exhigh', '128k': 'standard' }
 const HW_KW_LV = { flac24bit: '2000', flac: '2000', '320k': '320', '192k': '320', '128k': '320' }
 
 const enc = v => encodeURIComponent(String(v === undefined || v === null ? '' : v))
@@ -226,28 +248,38 @@ const H_KW = { Referer: 'https://www.kuwo.cn/' }
 // ==================== 酷我检索（跨平台兜底用） ==================== */
 const KUWO_CAR_SRC = 'kwplayercar_ar_6.0.1.0_apk_keluze.apk'
 
-/** 解析酷我搜索的伪 JSON（单引号 + &nbsp; 实体）：按 MUSICRID 定位，取窗口内 NAME / ARTIST */
+/** 解析酷我搜索的伪 JSON（字段按字母序、ARTIST 在 MUSICRID 之前、NAME 在之后）：
+ *  以 MUSICRID 为锚，ARTIST 取「上一条锚点 → 本条锚点」区间里的最后一个，NAME 取本条锚点之后第一个。
+ *  r74：旧实现用固定 ±600/900 窗口，ARTIST 常落在窗口外 → 歌手被当成空值，防串歌形同失效。 */
 function parseKuwoSearch(raw) {
   const out = []
   const re = /'MUSICRID'\s*:\s*'MUSIC_(\d+)'/g
+  const anchors = []
   let m
-  while ((m = re.exec(raw))) {
-    const win = raw.slice(Math.max(0, m.index - 600), Math.min(raw.length, m.index + 900))
-    const name = /'NAME'\s*:\s*'([^']*)'/.exec(win)
-    const artist = /'ARTIST'\s*:\s*'([^']*)'/.exec(win)
-    out.push({ rid: m[1], song: name ? name[1] : '', artist: artist ? artist[1] : '' })
+  while ((m = re.exec(raw))) anchors.push({ idx: m.index, rid: m[1] })
+  for (let i = 0; i < anchors.length; i++) {
+    const before = raw.slice(i > 0 ? anchors[i - 1].idx : 0, anchors[i].idx)
+    const after = raw.slice(anchors[i].idx, i + 1 < anchors.length ? anchors[i + 1].idx : raw.length)
+    const artists = [...before.matchAll(/'ARTIST'\s*:\s*'([^']*)'/g)]
+    const name = /'NAME'\s*:\s*'([^']*)'/.exec(after)
+    out.push({
+      rid: anchors[i].rid,
+      song: name ? name[1] : '',
+      artist: artists.length ? artists[artists.length - 1][1] : '',
+    })
   }
   return out
 }
 
-/** 严格挑歌：歌手必须命中、歌名必须精确相等、排除伴奏/翻唱/现场/串烧，否则返回 null（宁可失败不串歌） */
+/** 严格挑歌：歌名必须精确相等、歌手必须命中、排除伴奏/翻唱/现场/串烧，否则返回 null（宁可失败不串歌）
+ *  r74：不再对「歌手为空」的条目放行（那是上一版串歌的根源）。 */
 function pickKuwoExact(list, name, singer) {
   const want = normText(name)
   if (!want) return null
   const bad = /伴奏|纯音乐|铃声|cover|翻唱|现场|演唱会|live|remix|dj|吉他|ktv|原唱|版$/i
   let best = null
   for (const it of list) {
-    if (!singerHit(it.artist, singer)) continue
+    if (!it.artist || !singerHit(it.artist, singer)) continue
     if (normText(it.song) !== want) continue
     if (bad.test(it.song) || /\+/.test(it.song)) continue
     if (!best) best = it
@@ -267,20 +299,13 @@ function pickKuwoExact(list, name, singer) {
 //   from     溯源：这条链路来自旧包哪个文件 / 哪个上游
 const CHAIN = {
   wy: [
-    {
-      name: '网易官方',
-      from: '旧包 晴天 / FreeListen 同款官方接口',
-      build: c => `https://music.163.com/api/song/enhance/player/url?id=${enc(c.id)}&ids=%5B${enc(c.id)}%5D&br=${WY_BR[c.q] || '320000'}`,
-      headers: H_WY,
-    },
-    {
-      name: '溯音163',
-      from: '旧包 溯音系 / 上游 922 接口',
-      build: c => `https://oiapi.net/api/Music_163?id=${enc(c.id)}`,
-    },
+    /* r74 全链路体检（8 首样本 · 320k 档）：ikun 8/8 平均 115ms、bileizhen 8/8 平均 1.3s、
+       溯音163 3/8 136ms、星海GD 5/8 2.8s、网易官方 0/8（匿名不下发 url）、HYW 3/8 平均 6.7s（最慢失败 12s）。
+       已下架的死链：Huibq（onrender Service Suspended 503）、FFAPI（ECONNREFUSED）、lzmhhh（401 NEED_PASS）。
+       顺序改为「快而全 → 慢而全 → 覆盖不足 → 只做兜底」，避免一条慢链路把切歌拖到十几秒。 */
     {
       name: 'ikun网易',
-      from: '旧包 ikun 系（ikunshare 域名已死，仅此中转 endpoint 存活）',
+      from: '旧包 ikun 系（ikunshare 域名已死，仅此中转 endpoint 存活）· r74 实测 flac/320k/128k 全档 8/8',
       q: ['flac24bit', 'flac', '320k', '128k'],
       build: () => 'https://c.wwwweb.top/music/url',
       opts: c => ({
@@ -290,48 +315,36 @@ const CHAIN = {
       }),
     },
     {
+      name: 'bileizhen网易',
+      from: 'pdone 轻量音源 v2.1.0 · r74 实测 lossless/exhigh/standard 三档全通，直接回音频流（无需二次解析）',
+      asStream: true,
+      q: ['flac24bit', 'flac', '320k', '128k'],
+      build: c => `https://api.bileizhen.top/api/netease?id=${enc(c.id)}&level=${BIZ_LEVEL[c.q] || 'exhigh'}`,
+    },
+    {
+      name: '溯音163',
+      from: '旧包 溯音系 / 上游 922 接口 · r74 覆盖约 4 成，但命中只需 136ms',
+      build: c => `https://oiapi.net/api/Music_163?id=${enc(c.id)}`,
+    },
+    {
       name: '星海GD',
-      from: '上游 星海 / GD Studio 公开接口',
+      from: '上游 星海 / GD Studio 公开接口 · r74 覆盖 5/8，平均 2.8s',
       build: c => `https://music-api.gdstudio.xyz/api.php?types=url&source=netease&id=${enc(c.id)}&br=${GD_BR[c.q] || '320'}`,
     },
     {
-      name: 'Huibq网易',
-      from: '旧包 Huibq v1.2.0（本地域名已死，改用其在线最新版 onrender 入口）',
-      // 192k 档实测会回落成酷我镜像链（有串歌风险），只挂 flac/320k/128k
-      q: ['flac24bit', 'flac', '320k', '128k'],
-      build: c => `https://lxmusicapi.onrender.com/url/wy/${enc(c.id)}/${enc(c.q)}`,
-      headers: { 'X-Request-Key': 'share-v3' },
+      name: '网易官方',
+      from: '旧包 晴天 / FreeListen 同款官方接口 · 匿名不下发 url（0/8），仅登录态可用，留作最后兜底',
+      build: c => `https://music.163.com/api/song/enhance/player/url?id=${enc(c.id)}&ids=%5B${enc(c.id)}%5D&br=${WY_BR[c.q] || '320000'}`,
+      headers: H_WY,
+      timeout: 4000,
     },
     {
       name: 'HYW',
-      from: '上游 HYW 公益版',
-      // 只认 flac/320k/128k，192k 会 HTTP 400
-      q: ['flac24bit', 'flac', '320k', '128k'],
+      from: '上游 HYW 公益版 · r74 覆盖 3/8 且单次 6.7s 起（失败要等 12s），只留 320k/128k 当最后兜底',
+      // 只认 flac/320k/128k，192k 会 HTTP 400；超时压到 4.5s，别让它拖住切歌
+      q: ['320k', '128k'],
+      timeout: 4500,
       build: c => `http://103.79.184.97/api/music/url?source=wy&songId=${enc(c.id)}&quality=${c.q}&key=6C1F-53W0-GRKI-EVFG`,
-    },
-    {
-      name: 'FFAPI网易',
-      from: 'pdone 11-08 新增源 轻量音源 v2.1.0（qingliang）实测端点，flac 走 lossless 真无损',
-      q: ['flac24bit', 'flac', '320k', '128k'],
-      build: c => `https://ffapi.cn/int/v1/netease_url?id=${enc(c.id)}&quality=${FFAPI_Q[c.q] || 'exhigh'}`,
-    },
-    {
-      name: 'lzmhhh网易',
-      from: 'pdone 11-08 新增源 轻量音源 v2.1.0（qingliang），POST 表单，固定 320k',
-      q: ['320k'],
-      build: () => 'https://music.lzmhhh.com/api/music/url',
-      opts: c => ({
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded', Referer: 'https://music.lzmhhh.com/' },
-        body: `id=${enc(c.id)}&type=wy`,
-      }),
-    },
-    {
-      name: 'bileizhen网易',
-      from: 'pdone 11-08 新增源 轻量音源 v2.1.0（qingliang），302 直跳音频流',
-      asStream: true,
-      q: ['320k'],
-      build: c => `https://api.bileizhen.top/api/netease?id=${enc(c.id)}&level=exhigh`,
     },
   ],
 
@@ -442,16 +455,22 @@ const CHAIN = {
 
   kg: [
     {
-      name: '星海KG',
-      from: '上游 星海（旧包无可用酷狗链路，此为唯一原生酷狗接口）',
-      // 上游 flac 支持不稳（偶发 KG_SONG_NOT_FOUND 且耗时 2~18s），只挂 320k/128k，flac 请求走降级
+      name: '酷狗官方(128k)',
+      from: 'm.kugou.com 手机版 getSongInfo（cmd=playInfo）· r74 实测：免费曲直接下发 sharefs.kugou.com 完整音频（Range 206 audio/mpeg），付费曲回「需要付费」；无需 cookie，但只给 128k（传 320k/flac 的 hash 仍回 bitRate=128），所以 320k/flac 请求也挂它，先保证能播完整曲',
       q: ['320k', '128k'],
-      build: c => `https://yy.zddyr.top/lx/api/?source=kg&quality=${enc(c.q)}&mainHash=${enc(c.id)}`,
-      headers: { 'User-Agent': 'Mozilla/5.0' },
+      build: c => `https://m.kugou.com/app/i/getSongInfo.php?cmd=playInfo&hash=${enc(kgHashOf(c.mi, c.q) || c.id)}`,
+      headers: { 'User-Agent': 'Mozilla/5.0 (Linux; Android 11) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0 Mobile Safari/537.36', Referer: 'https://m.kugou.com/' },
+      parse: (b) => {
+        if (b && typeof b === 'string') { try { b = JSON.parse(b) } catch { return null } }
+        if (!b || typeof b !== 'object') return null
+        if (b.url) return b.url
+        if (b.error) throw new Error('酷狗:' + b.error)
+        return null
+      },
     },
     {
       name: '酷我检索备用',
-      from: '旧包 fish v1.0.1 的跨平台思路（酷我搜索 + 车机取链），本文件重写为严格匹配版',
+      from: '旧包 fish v1.0.1 的跨平台思路（酷我搜索 + 车机取链），本文件重写为严格匹配版 · r74 起升为酷狗主链',
       // 没有酷狗 ID 也能跑：只靠歌名 + 歌手；实测车机接口连 flac 也能出真无损
       needName: true,
       q: ['flac', '320k', '128k'],
@@ -465,6 +484,15 @@ const CHAIN = {
         return pickUrl(r2)
       },
     },
+    {
+      name: '星海KG',
+      from: '上游 星海 · 2026-11-26 体检：接口域名已整站不解析（ENOENT），保留在末位只为域名恢复后自动复活',
+      // 上游 flac 支持不稳（偶发 KG_SONG_NOT_FOUND 且耗时 2~18s），只挂 320k/128k，flac 请求走降级
+      q: ['320k', '128k'],
+      timeout: 3000,
+      build: c => `https://yy.zddyr.top/lx/api/?source=kg&quality=${enc(c.q)}&mainHash=${enc(c.id)}`,
+      headers: { 'User-Agent': 'Mozilla/5.0' },
+    },
   ],
 
   mg: [
@@ -472,6 +500,7 @@ const CHAIN = {
       name: '溯音咪咕(歌手)',
       from: '旧包 溯音系 / 上游 922 接口',
       needName: true,
+      timeout: 5000,
       build: c => `https://oiapi.net/api/MiGu_Music?msg=${enc(c.name + ' ' + c.singer)}&n=1&type=json`,
       parse: (b, c) => {
         if (!singerHit(pickField(b && b.data, ['singer', 'singers', 'artist']), c.singer)) return null
@@ -482,6 +511,7 @@ const CHAIN = {
       name: '溯音咪咕',
       from: '旧包 溯音系 / 上游 922 接口',
       needName: true,
+      timeout: 5000,
       build: c => `https://oiapi.net/api/MiGu_Music?msg=${enc(c.name)}&n=1&type=json`,
       parse: (b, c) => {
         if (!singerHit(pickField(b && b.data, ['singer', 'singers', 'artist']), c.singer)) return null
@@ -638,7 +668,7 @@ async function runLink(link, ctx) {
     method: o.method,
     body: o.body,
     headers: Object.assign({}, H_JSON, link.headers || {}, o.headers || {}),
-    timeout: CFG.reqTimeout,
+    timeout: link.timeout || CFG.reqTimeout,
   })
   // parse 允许异步（两段式链路：先检索再取链）
   let direct = link.parse ? link.parse(body, ctx) : pickUrl(body)
@@ -703,7 +733,7 @@ async function getUrl(platform, musicInfo, requestedQuality) {
   const singer = getSinger(musicInfo)
   if (!id && !name) throw new Error('缺少歌曲 ID / 歌名')
 
-  const ctx = { id, name, singer, q: wantQ, platform }
+  const ctx = { id, name, singer, q: wantQ, platform, mi: musicInfo }
 
   const ck = platform + ':' + (id || name) + ':' + wantQ
   const cached = cacheGet(ck)
@@ -773,5 +803,5 @@ send(EVENT_NAMES.inited, { openDevTools: false, sources: sourceConfig })
 // 供离线测试脚本调用（载入后可用 node test-chains.js 逐链路实测）
 globalThis.__X = { CFG, CHAIN, getUrl, runLink, tryChain, pickUrl, health, sourceConfig, parseKuwoSearch, pickKuwoExact, toSecure }
 
-console.log(`${TAG} YY Zone🎵音源 v1.3.1 已加载 —— wy/tx/kw/kg/mg，共 ` +
+console.log(`${TAG} YY Zone🎵音源 v1.3.3 已加载 —— wy/tx/kw/kg/mg，共 ` +
   Object.keys(CHAIN).map(p => p + ':' + CHAIN[p].length).join(' / '))
