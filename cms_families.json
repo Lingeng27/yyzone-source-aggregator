@@ -105,5 +105,21 @@
     "priority": 12,
     "line": "dbm3u8",
     "domains": ["api.apibdzy.com", "apibdzy.com", "www.apibdzy.com"]
+  },
+  {
+    "id": "cms_niuniu",
+    "name": "牛牛资源(1080P)",
+    "tags": ["1080P", "综合"],
+    "priority": 13,
+    "line": "",
+    "domains": ["api.niuniuzy.me", "niuniuzy.me", "www.niuniuzy.me"]
+  },
+  {
+    "id": "cms_taopian",
+    "name": "淘片采集",
+    "tags": ["采集", "更新快"],
+    "priority": 14,
+    "api": "https://taopianapi.com/cjapi/mc/vod/json.html",
+    "domains": ["taopianapi.com"]
   }
 ]

@@ -80,7 +80,10 @@ def probe(api, params="ac=list&pg=1", timeout=TIMEOUT):
 
 
 def candidates_for(family):
-    """一族源要试的 api 列表：先 from 加速路径，再标准路径。"""
+    """一族源要试的 api 列表：族里写死 api 的直接用它；否则先 from 加速路径，再标准路径。"""
+    custom = (family.get("api") or "").strip()
+    if custom:
+        return [(custom, "custom")]
     line = (family.get("line") or "").strip()
     out = []
     for host in family.get("domains") or []:
