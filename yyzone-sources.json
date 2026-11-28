@@ -1,7 +1,7 @@
 {
   "name": "YY ZONE 点播源库",
-  "updatedAt": "2026-11-28T00:22:41Z",
-  "count": 18,
+  "updatedAt": "2026-11-28T01:58:00Z",
+  "count": 20,
   "unavailable": [],
   "sources": [
     {
@@ -221,6 +221,36 @@
       "ms": 165,
       "total": 0,
       "path": "custom"
+    },
+    {
+      "id": "cms_zuid",
+      "name": "最大资源",
+      "api": "https://api.zuidapi.com/api.php/provide/vod/from/zuidam3u8/",
+      "tags": [
+        "1080P",
+        "片库大",
+        "线路多"
+      ],
+      "priority": 15,
+      "searchable": true,
+      "ms": 1683,
+      "total": 126344,
+      "path": "from"
+    },
+    {
+      "id": "cms_iqiyi",
+      "name": "iqiyi资源",
+      "api": "https://www.iqiyizyapi.com/api.php/provide/vod/from/iqym3u8/",
+      "tags": [
+        "1080P",
+        "起播快",
+        "海外剧"
+      ],
+      "priority": 16,
+      "searchable": true,
+      "ms": 993,
+      "total": 71517,
+      "path": "from"
     },
     {
       "id": "hub_ffzy1_tv",
