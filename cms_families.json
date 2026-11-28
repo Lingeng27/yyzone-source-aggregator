@@ -121,5 +121,21 @@
     "priority": 14,
     "api": "https://taopianapi.com/cjapi/mc/vod/json.html",
     "domains": ["taopianapi.com"]
+  },
+  {
+    "id": "cms_zuid",
+    "name": "最大资源",
+    "tags": ["1080P", "片库大", "线路多"],
+    "priority": 15,
+    "line": "zuidam3u8",
+    "domains": ["api.zuidapi.com", "zuidapi.com", "www.zuidapi.com"]
+  },
+  {
+    "id": "cms_iqiyi",
+    "name": "iqiyi资源",
+    "tags": ["1080P", "起播快", "海外剧"],
+    "priority": 16,
+    "line": "iqym3u8",
+    "domains": ["www.iqiyizyapi.com", "iqiyizyapi.com"]
   }
 ]
